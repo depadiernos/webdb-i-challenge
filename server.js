@@ -30,7 +30,7 @@ server.post("/api/accounts", async (req, res) => {
     budget: req.body.budget
   }
   try {
-    const [id] = await db('accounts').insert(data)
+    const [id] = await db("accounts").insert(data)
     console.log(id)
     const account = await db
       .select("*")
@@ -43,8 +43,35 @@ server.post("/api/accounts", async (req, res) => {
   }
 })
 
-server.put("/api/accounts/:id", async (req, res) => {})
+server.put("/api/accounts/:id", async (req, res) => {
+  const data = {
+    name: req.body.name,
+    budget: req.body.budget
+  }
+  try {
+    await db("accounts")
+      .where("id", req.params.id)
+      .update(data)
+    const account = await db
+      .select("*")
+      .from("accounts")
+      .where("id", req.params.id)
+      .first()
+    res.json(account)
+  } catch (err) {
+    console.log(err)
+  }
+})
 
-server.delete("/api/accounts/:id", async (req, res) => {})
+server.delete("/api/accounts/:id", async (req, res) => {
+  try {
+    const success = await db("accounts")
+      .where("id", req.params.id)
+      .del()
+    if (success) res.status(204).end()
+  } catch (err) {
+    console.log(err)
+  }
+})
 
 module.exports = server
